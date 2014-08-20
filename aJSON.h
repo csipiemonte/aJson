@@ -182,6 +182,9 @@ public:
 	// Render a aJsonObject entity to text for transfer/storage. Free the char* when finished.
 	int print(aJsonObject *item, aJsonStream* stream);
 	char* print(aJsonObject* item);
+
+	char* print(aJsonObject* item, char* outBuf, size_t length);
+
 	//Renders a aJsonObject directly to a output stream
 	char stream(aJsonObject *item, aJsonStream* stream);
 	// Delete a aJsonObject entity and all sub-entities.
@@ -212,11 +215,11 @@ public:
 	aJsonObject* createStringArray(const char **strings, unsigned char count);
 
 	// Append item to the specified array/object.
-	void addItemToArray(aJsonObject *array, aJsonObject *item);
-	void addItemToObject(aJsonObject *object, const char *string,
+	bool addItemToArray(aJsonObject *array, aJsonObject *item);
+	bool addItemToObject(aJsonObject *object, const char *string,
 			aJsonObject *item);
 	// Append reference to item to the specified array/object. Use this when you want to add an existing aJsonObject to a new aJsonObject, but don't want to corrupt your existing aJsonObject.
-	void addItemReferenceToArray(aJsonObject *array, aJsonObject *item);
+	bool addItemReferenceToArray(aJsonObject *array, aJsonObject *item);
 	void addItemReferenceToObject(aJsonObject *object, const char *string,
 			aJsonObject *item);
 
@@ -236,8 +239,8 @@ public:
 	void addBooleanToObject(aJsonObject* object, const char* name, bool b);
 	void addTrueToObject(aJsonObject* object, const char* name);
 	void addFalseToObject(aJsonObject* object, const char* name);
-	void addNumberToObject(aJsonObject* object, const char* name, int n);
-        void addNumberToObject(aJsonObject* object, const char* name, double n);
+	bool addNumberToObject(aJsonObject* object, const char* name, int n);
+    bool addNumberToObject(aJsonObject* object, const char* name, double n);
 	void addStringToObject(aJsonObject* object, const char* name,
 					const char* s);
 

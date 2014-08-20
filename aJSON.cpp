@@ -566,16 +566,26 @@ aJsonClass::print(aJsonObject* item, aJsonStream* stream)
 char*
 aJsonClass::print(aJsonObject* item)
 {
-  char* outBuf = (char*) malloc(256); /* XXX: Dynamic size. */
+  char* outBuf = (char*) malloc(512); /* XXX: Dynamic size. */
   if (outBuf == NULL)
     {
       return NULL;
     }
-  aJsonStringStream stringStream(NULL, outBuf, 256);
+  aJsonStringStream stringStream(NULL, outBuf, 512);
   print(item, &stringStream);
   return outBuf;
 }
 
+char* aJsonClass::print(aJsonObject* item, char* outBuf, size_t length)
+{
+  if (outBuf == NULL)
+    {
+      return NULL;
+    }
+  aJsonStringStream stringStream(NULL, outBuf, length);
+  print(item, &stringStream);
+  return outBuf;
+}
 // Parser core - when encountering text, process appropriately.
 int
 aJsonStream::parseValue(aJsonObject *item, char** filter)
@@ -965,12 +975,12 @@ aJsonClass::createReference(aJsonObject *item)
 }
 
 // Add item to array/object.
-void
+bool
 aJsonClass::addItemToArray(aJsonObject *array, aJsonObject *item)
 {
   aJsonObject *c = array->child;
   if (!item)
-    return;
+    return false;
   if (!c)
     {
       array->child = item;
@@ -981,23 +991,31 @@ aJsonClass::addItemToArray(aJsonObject *array, aJsonObject *item)
         c = c->next;
       suffixObject(c, item);
     }
+  return true;
 }
-void
+
+bool
 aJsonClass::addItemToObject(aJsonObject *object, const char *string,
     aJsonObject *item)
 {
   if (!item)
-    return;
+    return false;
   if (item->name)
     free(item->name);
-  item->name = strdup(string);
+  if ( ( item->name = strdup(string) ) == NULL)
+  {
+    return false;
+  }
   addItemToArray(object, item);
+  return true;
 }
-void
+
+bool
 aJsonClass::addItemReferenceToArray(aJsonObject *array, aJsonObject *item)
 {
-  addItemToArray(array, createReference(item));
+  return addItemToArray(array, createReference(item));
 }
+
 void
 aJsonClass::addItemReferenceToObject(aJsonObject *object, const char *string,
     aJsonObject *item)
@@ -1270,16 +1288,16 @@ aJsonClass::addFalseToObject(aJsonObject* object, const char* name)
   addItemToObject(object, name, createFalse());
 }
 
-void
+bool
 aJsonClass::addNumberToObject(aJsonObject* object, const char* name, int n)
 {
-  addItemToObject(object, name, createItem(n));
+  return addItemToObject(object, name, createItem(n));
 }
 
-void
+bool
 aJsonClass::addNumberToObject(aJsonObject* object, const char* name, double n)
 {
-  addItemToObject(object, name, createItem(n));
+  return addItemToObject(object, name, createItem(n));
 }
 
 void
