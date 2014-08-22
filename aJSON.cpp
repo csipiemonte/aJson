@@ -994,6 +994,7 @@ aJsonClass::addItemToArray(aJsonObject *array, aJsonObject *item)
   return true;
 }
 
+// Boeris start
 bool
 aJsonClass::addItemToObject(aJsonObject *object, const char *string,
     aJsonObject *item)
@@ -1015,6 +1016,7 @@ aJsonClass::addItemReferenceToArray(aJsonObject *array, aJsonObject *item)
 {
   return addItemToArray(array, createReference(item));
 }
+// Boeris Stop
 
 void
 aJsonClass::addItemReferenceToObject(aJsonObject *object, const char *string,
